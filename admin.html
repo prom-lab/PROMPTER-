@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة التحكم والإحصائيات — معمل البرومبتات</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Changa:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .admin-container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.1));
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    .stat-card {
+      background: var(--bg-card, #121824);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0; left: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #6366f1, #a855f7);
+    }
+    .stat-value {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: #fff;
+      margin: 10px 0 5px;
+      font-family: 'Changa', sans-serif;
+    }
+    .stat-label {
+      font-size: 0.95rem;
+      color: #94a3b8;
+    }
+    .admin-section {
+      background: var(--bg-card, #121824);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 28px;
+      margin-bottom: 35px;
+    }
+    .admin-section-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #f8fafc;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .table-responsive {
+      overflow-x: auto;
+    }
+    .custom-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: right;
+    }
+    .custom-table th, .custom-table td {
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .custom-table th {
+      background: rgba(255,255,255,0.03);
+      color: #94a3b8;
+      font-weight: 600;
+    }
+    .custom-table td {
+      color: #e2e8f0;
+    }
+    .badge-code {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      background: rgba(99, 102, 241, 0.15);
+      color: #818cf8;
+      font-weight: 700;
+      font-family: monospace;
+      font-size: 0.9rem;
+    }
+    .progress-bar-wrap {
+      background: rgba(255,255,255,0.06);
+      height: 10px;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #6366f1, #ec4899);
+      border-radius: 5px;
+      transition: width 0.4s ease;
+    }
+    .usage-item {
+      margin-bottom: 18px;
+    }
+    .usage-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.95rem;
+      color: #cbd5e1;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="admin-container">
+    <div class="admin-header">
+      <div>
+        <h1 style="font-size: 1.8rem; color: #fff; margin-bottom: 6px;">📊 لوحة تحكم وإحصائيات معمل البرومبتات</h1>
+        <p style="color: #94a3b8; font-size: 0.95rem;">متابعة تفاعلات المستخدمين وأكواد الدعوة واستخدام الأدوات</p>
+      </div>
+      <a href="index.html" class="btn btn-outline">🏠 العودة للموقع</a>
+    </div>
+
+    <!-- البطاقات الإحصائية الرئيسية -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">👥 مستخدمو أكواد الدعوة</div>
+        <div class="stat-value" id="totalInviteUsers">0</div>
+        <span style="font-size: 0.85rem; color: #10b981;">الأكواد PROMPETER-SIO-454 & USE-665</span>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">🚀 إجمالي استخدام الأدوات</div>
+        <div class="stat-value" id="totalToolUses">0</div>
+        <span style="font-size: 0.85rem; color: #a855f7;">توليد، هندسة عكسية وتصحيح</span>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">📱 مستخدمو الهواتف الذكية</div>
+        <div class="stat-value" id="mobilePercentage">0%</div>
+        <span style="font-size: 0.85rem; color: #3b82f6;" id="mobileUsersCount">0 مستخدم</span>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">💻 مستخدمو الأجهزة المكتبية</div>
+        <div class="stat-value" id="desktopPercentage">0%</div>
+        <span style="font-size: 0.85rem; color: #f59e0b;" id="desktopUsersCount">0 مستخدم</span>
+      </div>
+    </div>
+
+    <!-- قائمة مستخدمي أكواد الدعوة -->
+    <div class="admin-section">
+      <div class="admin-section-title">
+        <span>🎟️ قائمة المستخدمين الذين أدخلوا أكواد الدعوة</span>
+      </div>
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>اسم المستخدم</th>
+              <th>البريد الإلكتروني</th>
+              <th>كود الدعوة</th>
+              <th>تاريخ التفعيل</th>
+            </tr>
+          </thead>
+          <tbody id="inviteUsersTableBody">
+            <tr>
+              <td colspan="5" style="text-align: center; color: #94a3b8; padding: 25px;">جاري جلب البيانات من قاعدة البيانات...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- إحصائيات الأدوات والتفاعل -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px;">
+      
+      <div class="admin-section">
+        <div class="admin-section-title">
+          <span>🛠️ استخدام الأدوات بالموقع</span>
+        </div>
+        <div id="toolsUsageList">
+          <div class="usage-item">
+            <div class="usage-header">
+              <span>🖼️ مولد برومبتات الصور</span>
+              <strong id="useImgCount">0</strong>
+            </div>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" id="useImgBar" style="width: 0%;"></div></div>
+          </div>
+          <div class="usage-item">
+            <div class="usage-header">
+              <span>🎬 مولد برومبتات الفيديو</span>
+              <strong id="useVidCount">0</strong>
+            </div>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" id="useVidBar" style="width: 0%;"></div></div>
+          </div>
+          <div class="usage-item">
+            <div class="usage-header">
+              <span>🔍 الهندسة العكسية من صورة (Reverse Prompting)</span>
+              <strong id="useRevCount">0</strong>
+            </div>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" id="useRevBar" style="width: 0%;"></div></div>
+          </div>
+          <div class="usage-item">
+            <div class="usage-header">
+              <span>✨ مصحح ومقيم البرومبتات</span>
+              <strong id="useEvalCount">0</strong>
+            </div>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" id="useEvalBar" style="width: 0%;"></div></div>
+          </div>
+          <div class="usage-item">
+            <div class="usage-header">
+              <span>🎵 مولد الموسيقى و 💻 الأكواد</span>
+              <strong id="useOtherCount">0</strong>
+            </div>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" id="useOtherBar" style="width: 0%;"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-section">
+        <div class="admin-section-title">
+          <span>📱 توزيع نوع الأجهزة اليومي</span>
+        </div>
+        <div style="padding: 10px 0;">
+          <div class="usage-item">
+            <div class="usage-header">
+              <span>📱 الهواتف الذكية (Mobile)</span>
+              <strong id="mobileDetailText">0 (0%)</strong>
+            </div>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" id="mobileDetailBar" style="width: 0%; background: #3b82f6;"></div></div>
+          </div>
+          <div class="usage-item" style="margin-top: 25px;">
+            <div class="usage-header">
+              <span>💻 أجهزة الكمبيوتر (Desktop/Laptop)</span>
+              <strong id="desktopDetailText">0 (0%)</strong>
+            </div>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" id="desktopDetailBar" style="width: 0%; background: #f59e0b;"></div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script type="module">
+    import { db } from './firebase-config.js';
+    import { collection, getDocs, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+    async function loadAdminData() {
+      try {
+        // 1. جلب قائمة أكواد الدعوة المفعلة
+        const inviteUsersRef = collection(db, 'redeemedCodes');
+        const snap = await getDocs(inviteUsersRef);
+        const tableBody = document.getElementById('inviteUsersTableBody');
+        
+        let count = 0;
+        let tableHtml = '';
+
+        snap.forEach(docSnap => {
+          count++;
+          const data = docSnap.data();
+          const dateStr = data.redeemedAt?.toDate 
+            ? data.redeemedAt.toDate().toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+            : (data.date || 'اليوم');
+
+          tableHtml += `
+            <tr>
+              <td>${count}</td>
+              <td><strong>${data.userName || 'مستخدم'}</strong></td>
+              <td dir="ltr" style="text-align: right;">${data.userEmail || data.userId || 'غير معروف'}</td>
+              <td><span class="badge-code">${data.code || 'PROMPETER-CODE'}</span></td>
+              <td>${dateStr}</td>
+            </tr>
+          `;
+        });
+
+        document.getElementById('totalInviteUsers').textContent = count;
+
+        if (count === 0) {
+          tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #94a3b8; padding: 25px;">لا يوجد مستخدمون قاموا بإدخال كود الدعوة حتى الآن. الأكواد المتاحة: PROMPETER-SIO-454 و PROMPETER-USE-665</td></tr>`;
+        } else {
+          tableBody.innerHTML = tableHtml;
+        }
+
+        // 2. جلب إحصائيات الأدوات والأجهزة
+        const statsRef = doc(db, 'analytics', 'globalStats');
+        const statsSnap = await getDoc(statsRef);
+
+        if (statsSnap.exists()) {
+          const stats = statsSnap.data();
+          const imgUses = stats.imageGen || 0;
+          const vidUses = stats.videoGen || 0;
+          const revUses = stats.reversePrompt || 0;
+          const evalUses = stats.promptEval || 0;
+          const otherUses = (stats.musicGen || 0) + (stats.websiteGen || 0);
+
+          const totalToolUses = imgUses + vidUses + revUses + evalUses + otherUses;
+          document.getElementById('totalToolUses').textContent = totalToolUses;
+
+          const max = Math.max(1, totalToolUses);
+          document.getElementById('useImgCount').textContent = imgUses;
+          document.getElementById('useImgBar').style.width = `${(imgUses / max) * 100}%`;
+
+          document.getElementById('useVidCount').textContent = vidUses;
+          document.getElementById('useVidBar').style.width = `${(vidUses / max) * 100}%`;
+
+          document.getElementById('useRevCount').textContent = revUses;
+          document.getElementById('useRevBar').style.width = `${(revUses / max) * 100}%`;
+
+          document.getElementById('useEvalCount').textContent = evalUses;
+          document.getElementById('useEvalBar').style.width = `${(evalUses / max) * 100}%`;
+
+          document.getElementById('useOtherCount').textContent = otherUses;
+          document.getElementById('useOtherBar').style.width = `${(otherUses / max) * 100}%`;
+
+          // الأجهزة
+          const mobile = stats.mobileVisits || 0;
+          const desktop = stats.desktopVisits || 0;
+          const totalDevices = mobile + desktop || 1;
+          const mobilePct = Math.round((mobile / totalDevices) * 100);
+          const desktopPct = Math.round((desktop / totalDevices) * 100);
+
+          document.getElementById('mobilePercentage').textContent = `${mobilePct}%`;
+          document.getElementById('mobileUsersCount').textContent = `${mobile} مستخدم`;
+
+          document.getElementById('desktopPercentage').textContent = `${desktopPct}%`;
+          document.getElementById('desktopUsersCount').textContent = `${desktop} مستخدم`;
+
+          document.getElementById('mobileDetailText').textContent = `${mobile} (${mobilePct}%)`;
+          document.getElementById('mobileDetailBar').style.width = `${mobilePct}%`;
+
+          document.getElementById('desktopDetailText').textContent = `${desktop} (${desktopPct}%)`;
+          document.getElementById('desktopDetailBar').style.width = `${desktopPct}%`;
+        }
+
+      } catch (err) {
+        console.error("Error loading admin data:", err);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', loadAdminData);
+  </script>
+</body>
+</html>
