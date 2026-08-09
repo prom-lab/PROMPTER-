@@ -22,7 +22,9 @@ import { db, auth, storage,
          PAYMENT_INFO, MODEL_DISPLAY,
          AVAILABLE_MODELS, MODEL_TEXT }                  from './firebase-config.js';
 import { generatePromptPlan, fixSelectedText,
-         evaluateAndCorrectPrompt }                     from './ai-service.js';
+         evaluateAndCorrectPrompt,
+         reversePromptFromImage, modifyPromptWithAI,
+         fileToBase64 }                                 from './ai-service.js';
 import { boysCardsData }                                from './boy.js';
 import { girlsCardsData }                               from './girl.js';
 
@@ -1575,17 +1577,151 @@ function setupPromptCorrector() {
 let likedReelIds = JSON.parse(localStorage.getItem('likedReelIds') || '[]');
 
 function getCombinedReelsData() {
+  const fixImg = (imgStr) => {
+    if (!imgStr) return 'IMAGES/grf-image.png';
+    if (imgStr.startsWith('http') || imgStr.startsWith('IMAGES/')) return imgStr;
+    return `IMAGES/${imgStr}`;
+  };
+
   const boysMapped = (boysCardsData || []).map(item => ({
     ...item,
     id: `boy_${item.id}`,
-    category: item.category || 'بنين'
+    category: item.category || 'بنين',
+    image: fixImg(item.image)
   }));
   const girlsMapped = (girlsCardsData || []).map(item => ({
     ...item,
     id: `girl_${item.id}`,
-    category: item.category || 'بنات'
+    category: item.category || 'بنات',
+    image: fixImg(item.image)
   }));
   return [...boysMapped, ...girlsMapped];
+}
+
+// ─── Reverse Image Prompt Tool ─────────────────────────────
+let currentReverseBase64 = null;
+let currentExtractedPrompt = "";
+
+function setupReversePromptTool() {
+  const fileInput = document.getElementById('reverseFileInput');
+  const urlInput = document.getElementById('reverseUrlInput');
+  const dropzone = document.getElementById('reverseDropzone');
+  const previewWrap = document.getElementById('reversePreviewWrap');
+  const previewImg = document.getElementById('reversePreviewImg');
+  const submitBtn = document.getElementById('reverseSubmitBtn');
+  const resultBox = document.getElementById('reverseResultBox');
+  const removeBtn = document.getElementById('removeReverseImgBtn');
+
+  if (!dropzone && !fileInput && !submitBtn) return;
+
+  dropzone?.addEventListener('click', () => fileInput?.click());
+
+  fileInput?.addEventListener('change', async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      currentReverseBase64 = await fileToBase64(file);
+      if (previewImg) previewImg.src = currentReverseBase64;
+      if (previewWrap) previewWrap.style.display = 'block';
+      if (urlInput) urlInput.value = '';
+    } catch (err) {
+      showToast('خطأ في قراءة صورة الفايل: ' + err.message, 'error');
+    }
+  });
+
+  urlInput?.addEventListener('input', () => {
+    const url = urlInput.value.trim();
+    if (url && previewImg && previewWrap) {
+      currentReverseBase64 = null;
+      previewImg.src = url;
+      previewWrap.style.display = 'block';
+    }
+  });
+
+  removeBtn?.addEventListener('click', () => {
+    currentReverseBase64 = null;
+    if (urlInput) urlInput.value = '';
+    if (fileInput) fileInput.value = '';
+    if (previewWrap) previewWrap.style.display = 'none';
+  });
+
+  submitBtn?.addEventListener('click', async () => {
+    const imgUrl = urlInput?.value?.trim();
+    if (!currentReverseBase64 && !imgUrl) {
+      showToast('الرجاء اختيار صورة أو إدخال رابط صورة أولاً', 'warning');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = '⏳ جاري تحليل الصورة واستخراج البرومبت...';
+    if (resultBox) resultBox.style.display = 'none';
+
+    try {
+      const res = await reversePromptFromImage({
+        imageBase64: currentReverseBase64,
+        imageUrl: imgUrl
+      });
+
+      document.getElementById('reverseTitle').textContent = res.title || 'صورة محللة';
+      document.getElementById('reverseStyleBadge').textContent = res.style || 'واقعي';
+      
+      currentExtractedPrompt = res.mainPrompt || '';
+      document.getElementById('reverseMainPrompt').textContent = currentExtractedPrompt;
+      document.getElementById('reverseArabicDesc').textContent = res.arabicPrompt || '';
+      document.getElementById('reverseNegativePrompt').textContent = res.negativePrompt || 'ugly, blurry';
+      
+      const toolsEl = document.getElementById('reverseToolsList');
+      if (toolsEl && res.suggestedTools) {
+        toolsEl.innerHTML = res.suggestedTools.map(t => `<span class="chip">${t}</span>`).join(' ');
+      }
+
+      if (resultBox) resultBox.style.display = 'block';
+      trackAnalytics('reversePrompt');
+      showToast('✨ تم الهندسة العكسية للبرومبت بنجاح!', 'success');
+    } catch (err) {
+      showToast('حدث خطأ أثناء استخراج البرومبت: ' + err.message, 'error');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = '🔍 استخرج البرومبت من الصورة الآن';
+    }
+  });
+
+  // Copy Prompt
+  document.getElementById('copyReversePromptBtn')?.addEventListener('click', () => {
+    if (currentExtractedPrompt) {
+      navigator.clipboard.writeText(currentExtractedPrompt);
+      showToast('📋 تم نسخ البرومبت الاستخراجي!', 'success');
+    }
+  });
+
+  // Interactive Refinement Chat
+  document.getElementById('refinePromptForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const input = document.getElementById('refinePromptInput');
+    const instruction = (input?.value || '').trim();
+    if (!instruction || !currentExtractedPrompt) return;
+
+    const btn = document.getElementById('refinePromptBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳...';
+
+    try {
+      const modRes = await modifyPromptWithAI({
+        originalPrompt: currentExtractedPrompt,
+        instruction
+      });
+
+      currentExtractedPrompt = modRes.updatedPrompt;
+      document.getElementById('reverseMainPrompt').textContent = currentExtractedPrompt;
+      showToast('✨ تم تعديل البرومبت بناءً على طلبك! ' + (modRes.arabicSummary || ''), 'success');
+      if (input) input.value = '';
+    } catch (err) {
+      showToast('خطأ في التعديل: ' + err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'تطبيق التعديل';
+    }
+  });
 }
 
 function setupReelsStore() {
@@ -1778,6 +1914,7 @@ function renderLikedReels() {
 initLanguage();
 populateModelSelect();
 setupPromptCorrector();
+setupReversePromptTool();
 setupReelsStore();
 renderLikedReels();
 trackAnalytics();

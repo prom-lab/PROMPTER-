@@ -201,58 +201,7 @@ ${depthNote}
   ]
 }
 
-الأدوات: Suno AI v4, Udio, Stable Audio 2.0, MusicGen, Beatoven.ai, Soundraw, Mubert.`,
-
-    website: `أنت خبير عالمي في كتابة البرومبتات لإنشاء المواقع بأدوات الذكاء الاصطناعي.
-${depthNote}
-
-مهمتك: تحليل طلب المستخدم وإنشاء خطة برومبتات شاملة لإنشاء موقع احترافي مع قوالب برومبت وأمثلة جاهزة لكتابتها في أدوات توليد الأكواد.
-
-تقييم الطلب أولاً:
-إذا كان الطلب مبهماً أو يفتقد لتفاصيل (نوع الموقع، الغرض، التصميم)، أرجع:
-{
-  "needsMoreDetails": true,
-  "questions": [
-    {
-      "id": "site_type",
-      "question": "ما هو نوع الموقع المطلوب؟",
-      "options": ["صفحة هبوط تسويقية (Landing Page)", "موقع شركة تعريفي (Corporate)", "متجر إلكتروني (E-commerce)", "معرض أعمال / بورتفوليو (Portfolio)", "تطبيق ويب متكامل (Web App)", "مدونة / موقع محتوى"]
-    },
-    {
-      "id": "design_style",
-      "question": "ما هو أسلوب التصميم المفضل؟",
-      "options": ["داكن عصري (Dark Mode Premium)", "أبيض نظيف (Clean Minimalist)", "جريء وملون (Bold & Colorful)", "تقليدي احترافي (Traditional Corporate)", "إبداعي تجريبي (Creative Experimental)"]
-    },
-    {
-      "id": "tech_stack",
-      "question": "ما هي التقنيات أو الأدوات المفضلة؟",
-      "options": ["Bolt.new / Lovable (سريع بلا كود)", "v0.dev (React احترافي)", "Replit Agent (تطبيق كامل)", "WordPress / Webflow", "HTML/CSS/JS بسيط"]
-    }
-  ]
-}
-
-إذا كان الطلب واضحاً، أرجع:
-{
-  "needsMoreDetails": false,
-  "tools": [
-    {"name": "Bolt.new", "type": "مجاني", "url": "https://bolt.new", "desc": "تسمح لك ببناء، تشغيل وتثبيت تطبيقات الويب بالكامل في المتصفح باستخدام React وVite."},
-    {"name": "v0.dev", "type": "مجاني", "url": "https://v0.dev", "desc": "أداة رائعة من Vercel لتوليد واجهات مستخدم احترافية باستخدام Tailwind CSS وShadcn UI."}
-  ],
-  "plan": [
-    {"title": "🏗️ 1. وصف الموقع والهدف (Site Overview)", "prompt": "البرومبت الافتتاحي المقترح للأداة: Build a modern luxury real estate landing page with React. It should feature a clean design, dark mode aesthetics, hero section with a search bar, property grid, and an interactive contact form."},
-    {"title": "🎨 2. التصميم والأقسام (Design & Sections)", "prompt": "هيكل وتصميم الأقسام بالتفصيل: Hero section with background video placeholder, grid showing 6 properties with cards containing image, title, price, and 'View details' button. Use emerald green and gold colors. Dark theme: background #0a0e14, cards #121824."},
-    {"title": "⚙️ 3. الوظائف والمميزات التقنية", "prompt": "الميزات البرمجية التفاعلية: Filter functionality by location, price and property type. Simple local state storage for favorites list. Smooth transitions and hover effects using Framer Motion style."},
-    {"title": "📝 4. المحتوى والنصوص (Content)", "prompt": "نصوص وهمية مقترحة عالية الجودة: 'Find Your Dream Luxury Home' as hero title. 'Explore our curated collection of premier estates'."},
-    {"title": "🚀 5. SEO والنشر (Launch & SEO)", "prompt": "إعدادات النشر: React-helmet configuration for meta tags. Title: 'Elite Estates | Luxury Real Estate', Meta Description: 'Discover exclusive luxury properties for sale'."}
-  ],
-  "tips": [
-    "عند استخدام Bolt.new، يمكنك كتابة طلبات متتالية مثل 'أضف صفحة تفاصيل لكل عقار' وسيقوم بتحديث الكود بشكل ذكي.",
-    "استعن بمكتبة Lucide React للأيقونات، وShadcn UI للمكونات الجاهزة لضمان تصميم عصري.",
-    "تأكد من توافقية الألوان وتباينها لدعم سهولة الاستخدام ومتطلبات الوصول."
-  ]
-}
-
-الأدوات: v0.dev, Bolt.new, Lovable, Replit Agent, GitHub Copilot, Cursor AI, Builder.io.`
+الأدوات: Suno AI v4, Udio, Stable Audio 2.0, MusicGen, Beatoven.ai, Soundraw, Mubert.`
   };
 
   return prompts[type] || prompts.video;
@@ -261,7 +210,7 @@ ${depthNote}
 // ─── بناء رسالة المستخدم ─────────────────────────────────
 function buildUserMessage(type, description, imageBase64 = null) {
   const typeLabels = {
-    video: 'فيديو', image: 'صورة', music: 'موسيقى', website: 'موقع'
+    video: 'فيديو', image: 'صورة', music: 'موسيقى'
   };
   const content = [];
 

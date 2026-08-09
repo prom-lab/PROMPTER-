@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>تطبيق معمل البرومبتات — Mobile App Edition</title>
+  <meta name="description" content="نسخة تطبيق الهواتف الذكية المخصصة لـ AppCreator24 مع واجهة سلسة وسريعة لجميع الأدوات والريلز.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Changa:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      padding-bottom: 74px; /* Space for bottom navigation bar */
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .app-top-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(15, 23, 42, 0.96);
+      backdrop-filter: blur(10px);
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- App Top Header Bar -->
+  <header class="app-top-header">
+    <div style="display:flex; align-items:center; gap:8px;">
+      <span style="font-size:22px;">📱</span>
+      <span class="logo-text animated-logo" style="font-size:1.1rem;">معمل البرومبت (التطبيق)</span>
+    </div>
+    <span class="chip" style="font-size:11px; padding:2px 8px; background:rgba(16,185,129,0.15); color:#34d399;">VIP App</span>
+  </header>
+
+  <!-- Container for App Views -->
+  <main id="appMobileView" style="padding:16px;">
+    
+    <!-- View 1: Reels Feed (Default in App) -->
+    <div id="mViewReels" class="m-view">
+      <div style="text-align:center; margin-bottom:16px;">
+        <h2 class="animated-signature" style="font-size:1.3rem; margin:0 0 4px 0;">🔥 متجر الريلز والأصول</h2>
+        <p style="color:#94a3b8; font-size:0.85rem; margin:0;">اسكرول وشوف البرومبتات والصور الجاهزة للنسخ والتنزيل</p>
+      </div>
+
+      <div style="margin-bottom:14px;">
+        <input type="text" id="reelsSearchInput" class="field-input" placeholder="🔍 ابحث بالكلمات..." style="font-size:13px; padding:10px 14px;">
+      </div>
+
+      <div class="chips-group" id="reelsCategoryChips" style="margin-bottom:16px; justify-content:center;">
+        <button class="chip is-active" data-cat="all">الكل ✨</button>
+        <button class="chip" data-cat="بنين">بنين 👦</button>
+        <button class="chip" data-cat="بنات">بنات 👧</button>
+      </div>
+
+      <div class="reels-feed-container" id="reelsFeedContainer" style="padding:0;"></div>
+    </div>
+
+    <!-- View 2: Prompt Generator -->
+    <div id="mViewGen" class="m-view" style="display:none;">
+      <div class="reverse-tool-card">
+        <h3 class="animated-signature" style="margin-top:0;">🤖 توليد البرومبتات بالذكاء الاصطناعي</h3>
+        
+        <form id="wsFormMobile" class="ws-form">
+          <label class="field-label">نوع المحتوى:</label>
+          <div style="display:flex; gap:8px; margin-bottom:12px;">
+            <button type="button" class="btn btn-outline gen-type-btn is-active" data-type="video" style="flex:1;">🎬 فيديو</button>
+            <button type="button" class="btn btn-outline gen-type-btn" data-type="image" style="flex:1;">🖼️ صورة</button>
+            <button type="button" class="btn btn-outline gen-type-btn" data-type="music" style="flex:1;">🎵 موسيقى</button>
+          </div>
+
+          <label class="field-label">وصف الفكرة:</label>
+          <textarea id="wsDescription" class="field-textarea" rows="4" placeholder="احكي فكرتك هنا..." required></textarea>
+
+          <button type="submit" class="btn btn-primary" style="width:100%; margin-top:12px;">🤖 توليد الخطة</button>
+        </form>
+
+        <div id="wsLoading" hidden style="text-align:center; padding:20px 0;">
+          <p style="color:#38bdf8;">⏳ جاري التوليد...</p>
+        </div>
+
+        <div id="wsResult" hidden style="margin-top:14px; background:#0f172a; padding:14px; border-radius:10px;">
+          <div id="wsPlanBody" style="color:#e2e8f0; font-size:13px; font-family:monospace;"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Bottom Fixed Navigation Bar -->
+  <nav class="mobile-app-bottom-nav">
+    <button class="mobile-nav-item is-active" data-target="mViewReels">
+      <span class="mobile-nav-icon">🔥</span>
+      <span>الريلز</span>
+    </button>
+    <button class="mobile-nav-item" data-target="mViewGen">
+      <span class="mobile-nav-icon">🤖</span>
+      <span>توليد</span>
+    </button>
+    <a href="index.html" class="mobile-nav-item" style="text-decoration:none;">
+      <span class="mobile-nav-icon">🌐</span>
+      <span>الموقع</span>
+    </a>
+  </nav>
+
+  <script type="module" src="app.js"></script>
+  <script>
+    // Tab switcher for WebView App
+    document.querySelectorAll('.mobile-nav-item[data-target]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.mobile-nav-item').forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        
+        const targetId = btn.dataset.target;
+        document.querySelectorAll('.m-view').forEach(v => v.style.display = 'none');
+        const targetView = document.getElementById(targetId);
+        if (targetView) targetView.style.display = 'block';
+      });
+    });
+  </script>
+</body>
+</html>

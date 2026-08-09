@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مولد البرومبتات والهندسة العكسية — معمل البرومبت</title>
+  <meta name="description" content="صفحة منفصلة احترافية لتوليد برومبتات الفيديو والصور والموسيقى مع الهندسة العكسية والتعديل التفاعلي.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Changa:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ============ NAV ============ -->
+  <header class="nav">
+    <div class="nav-inner" id="navInner">
+      <a href="index.html" class="logo" aria-label="الصفحة الرئيسية">
+        <span class="logo-text animated-logo">معمل البرومبت</span>
+      </a>
+
+      <nav class="nav-links">
+        <a href="index.html" class="nav-link">الرئيسية</a>
+        <a href="generator.html" class="nav-link is-active">أنشئ برومبت</a>
+        <a href="reels.html" class="nav-link">reels pro</a>
+        <a href="app.html" class="nav-link">التطبيق 📱</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="btn btn-outline btn-sm lang-btn" id="langToggleBtn">English</button>
+        <a href="index.html" class="btn btn-primary">العودة للموقع الرئيسي</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="admin-container" style="max-width:1100px; margin:40px auto; padding:0 20px;">
+    
+    <div style="text-align:center; margin-bottom:30px;">
+      <h1 class="display animated-signature" style="font-size:2.2rem; margin-bottom:8px;">أداة توليد البرومبتات الاحترافية</h1>
+      <p style="color:#94a3b8; font-size:1rem;">احكي فكرتك والذكاء الاصطناعي هيجهزلك برومبت محترف ومكتمل التفاصيل</p>
+    </div>
+
+    <!-- ===== Prompt Generator Interface ===== -->
+    <div class="reverse-tool-card">
+      <h2 style="color:#fff; font-size:1.3rem; margin-bottom:16px;" class="animated-signature">✨ مولد البرومبتات الذكي</h2>
+      
+      <form id="wsFormStandalone" class="ws-form">
+        <label class="field-label">اختَر نوع المحتوى المطلوب:</label>
+        <div style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap;">
+          <button type="button" class="btn btn-outline gen-type-btn is-active" data-type="video">🎬 فيديو</button>
+          <button type="button" class="btn btn-outline gen-type-btn" data-type="image">🖼️ صورة</button>
+          <button type="button" class="btn btn-outline gen-type-btn" data-type="music">🎵 موسيقى</button>
+        </div>
+
+        <label class="field-label" for="genDesc">وصف الفكرة بالتفصيل:</label>
+        <textarea id="genDesc" class="field-textarea" rows="5" placeholder="اكتب فكرتك بكلامك المباشر مع تحديد الجو العام..." required></textarea>
+
+        <button type="submit" class="btn btn-primary btn-lg" style="width:100%; margin-top:16px;">🤖 جهّزلي الخطة والبرومبت الآن</button>
+      </form>
+
+      <div id="genLoading" hidden style="text-align:center; padding:30px 0;">
+        <div style="font-size:32px;">⏳</div>
+        <p style="color:#38bdf8; font-weight:700;">الذكاء الاصطناعي بيجهز خطتك بالكامل...</p>
+      </div>
+
+      <div id="genResult" hidden style="margin-top:20px; background:#0f172a; padding:20px; border-radius:14px; border:1px solid rgba(255,255,255,0.1);">
+        <h3 style="color:#a7f3d0; margin-top:0;">📋 خطة البرومبت المجهزة:</h3>
+        <pre id="genOutputText" style="white-space:pre-wrap; font-family:monospace; color:#e2e8f0; font-size:0.9rem; word-break:break-word;"></pre>
+      </div>
+    </div>
+
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
